@@ -9,7 +9,7 @@ function AppendElement(total){
 	if(JSON.parse(localStorage.getItem("cart").length > 0)){
 		
 		JSON.parse(localStorage.getItem("cart")).map((item)=>{
-			total += parseFloat(item.price.slice(0,-1))
+			total += parseFloat(item.price.slice(0,-1).replace(",", ""))
 		 $(".list-product").append(`<li class="product-item">
 		<img src=${item.image.substring(1)}>
 		<div class="product-name">${item.product}
@@ -23,6 +23,7 @@ function AppendElement(total){
 		
 		})
 	}
+	
 	$(".total-price").html(`${total}d`)
 }
 function Quantity(){
@@ -30,7 +31,8 @@ function Quantity(){
 	let total = 0;
 	$(".product-quantity").each(function(){
 		number += parseInt($(this).val());
-		total += parseFloat($(this).siblings(".product-price").text().slice(0,-1)) * parseInt($(this).val())
+		
+		total += parseFloat($(this).siblings(".product-price").text().slice(0,-1).replace(",", "")) * parseInt($(this).val())
 	})
 	localStorage.setItem("cart_number", number)
 	$("#cart-quantity").html(`${localStorage.getItem("cart_number")}`)
@@ -94,6 +96,7 @@ $(document).ready(function ($) {
 		localStorage.setItem("cart", JSON.stringify([]))
 		localStorage.setItem("cart_number", 0)
 		Empty();
+		$(".total-price").html(`0d`)
 	})
 	$("#cart-quantity").html(localStorage.getItem("cart_number").toString() || 0)
 	dm_click();
