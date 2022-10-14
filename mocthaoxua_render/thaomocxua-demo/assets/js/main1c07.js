@@ -3,6 +3,7 @@ awe.init = function () {
 	awe.showPopup();
 	awe.hidePopup();	
 };
+
 $(document).ready(function ($) {
 
 	"use strict";
@@ -16,7 +17,8 @@ $(document).ready(function ($) {
 	$('.header-main .time').each(function(e){
 		awe_countDown2($(this));
 	});
-
+	if(!localStorage.getItem("cart")) localStorage.setItem("cart", JSON.stringify([]))
+	if(!localStorage.getItem("cart_number")) localStorage.setItem("cart_number", 0)
 	$('[data-toggle="tooltip"]').tooltip();
 	/*Time product_grid_office*/
 	$('.wrapitem_deal').each(function(e){
@@ -29,6 +31,27 @@ $(document).ready(function ($) {
 	$('.times').each(function(e){
 		awe_countDown($(this));
 	});
+
+	if(JSON.parse(localStorage.getItem("cart").length > 0)){
+		console.log("a")
+		JSON.parse(localStorage.getItem("cart")).map((item)=>{
+			console.log(item)
+			$(".list-product").append(`<li class="product-item">
+		<img src=${item.image.substring(1)}>
+		<div class="product-name">${item.product}
+		</div>
+		<div class="product-price">${item.price}</div>
+		<input type="number" class="product-quantity" value="1">
+		<button class="remove-btn">Remove</button>
+
+	</li>`)
+
+		
+		})
+	}
+
+	$(".product-quantity").c
+	$("#cart-quantity").html(localStorage.getItem("cart_number").toString() || 0)
 	dm_click();
 });
 
@@ -1387,3 +1410,25 @@ $(document).mouseup(function(e) {
     }
 	}
 });
+
+$(".btn_add_cart").click(function(e){
+	e.preventDefault();
+	$number = $('#cart-quantity').html();
+	localStorage.setItem("cart_number", parseInt($number)+ 1)
+	$('#cart-quantity').html((localStorage.getItem("cart_number")).toString());
+	$new_cart = {};
+	$new_cart.price = $(e.target.parentNode.parentNode.parentNode.querySelector(".product-price")).text();
+	$new_cart.product = $(e.target.parentNode.parentNode.parentNode.parentNode.querySelector(".title-product")).text()
+	$new_cart.image = $(e.target.parentNode.parentNode.parentNode.parentNode.parentNode.querySelector("img")).attr("src")
+
+	$data =JSON.parse(localStorage.getItem("cart") || []);
+
+
+	localStorage.setItem("cart", JSON.stringify([...$data, $new_cart]))
+})
+
+$("#cart").click(function(e){
+	e.preventDefault();
+	window.location ="http://127.0.0.1:5500/mocthaoxua_render/thaomocxua-demo/cart.html" ;
+
+})
