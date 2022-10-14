@@ -3,7 +3,45 @@ awe.init = function () {
 	awe.showPopup();
 	awe.hidePopup();	
 };
+function AppendElement(total){
+	 
+	$(".list-product").html("");
+	if(JSON.parse(localStorage.getItem("cart").length > 0)){
+		
+		JSON.parse(localStorage.getItem("cart")).map((item)=>{
+			total += parseFloat(item.price.slice(0,-1))
+		 $(".list-product").append(`<li class="product-item">
+		<img src=${item.image.substring(1)}>
+		<div class="product-name">${item.product}
+		</div>
+		<div class="product-price">${item.price}</div>
+		<input type="number" class="product-quantity" value="1">
+		<button class="remove-btn">Remove</button>
 
+	</li>`)
+
+		
+		})
+	}
+	$(".total-price").html(`${total}d`)
+}
+function Quantity(){
+	let number = 0;
+	let total = 0;
+	$(".product-quantity").each(function(){
+		number += parseInt($(this).val());
+		total += parseFloat($(this).siblings(".product-price").text().slice(0,-1)) * parseInt($(this).val())
+	})
+	localStorage.setItem("cart_number", number)
+	$("#cart-quantity").html(`${localStorage.getItem("cart_number")}`)
+	$(".total-price").html(`${total}d`)
+}
+function Empty(){
+	if(localStorage.getItem("cart_number") == 0){
+		$(".list-product").html("<li><h1>Cart is empty!</h1></li>")
+		$("#cart-quantity").html(`${localStorage.getItem("cart_number")}`)
+	}
+}
 $(document).ready(function ($) {
 
 	"use strict";
@@ -32,42 +70,30 @@ $(document).ready(function ($) {
 		awe_countDown($(this));
 	});
 	let total = 0;
-	if(JSON.parse(localStorage.getItem("cart").length > 0)){
-		
-		JSON.parse(localStorage.getItem("cart")).map((item)=>{
-			total += parseFloat(item.price.slice(0,-1))
-		 $(".list-product").append(`<li class="product-item">
-		<img src=${item.image.substring(1)}>
-		<div class="product-name">${item.product}
-		</div>
-		<div class="product-price">${item.price}</div>
-		<input type="number" class="product-quantity" value="1">
-		<button class="remove-btn">Remove</button>
-
-	</li>`)
-
-		
-		})
-	}
-
-	$(".total-price").html(`${total}d`)
+	AppendElement(total);
+	Empty();
+	
 	$(".product-quantity").change(function(e){
-		let number = 0;
-		total = 0
+		
 		if($(this).val() < 1 || isNaN($(this).val())) $(this).val("1")
-		$(".product-quantity").each(function(){
-			number += parseInt($(this).val());
-			total += parseFloat($(this).siblings(".product-price").text().slice(0,-1)) * parseInt($(this).val())
-		})
-		localStorage.setItem("cart_number", number)
-		$("#cart-quantity").html(`${localStorage.getItem("cart_number")}`)
-		$(".total-price").html(`${total}d`)
+		Quantity();
 	})
-	$(".remove-btn").click(function(){
+	$(".remove-btn").click(function(e){
+		e.preventDefault();
 		let local = JSON.parse(localStorage.getItem("cart"))
 		let value = $(this).siblings(".product-name").text().trim();
-		let removeItem = local.filter(item=>item.product.trim() === value)
-		console.log(removeItem)
+		let removeItem = local.filter(item=>item.product.trim() !== value)
+		localStorage.setItem("cart", JSON.stringify(removeItem));
+		AppendElement(total);
+		Quantity();
+		Empty();
+	})
+	$(".purchase-btn").click(function(e){
+		e.preventDefault();
+		console.log("a")
+		localStorage.setItem("cart", JSON.stringify([]))
+		localStorage.setItem("cart_number", 0)
+		Empty();
 	})
 	$("#cart-quantity").html(localStorage.getItem("cart_number").toString() || 0)
 	dm_click();
