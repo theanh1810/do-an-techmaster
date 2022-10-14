@@ -31,12 +31,12 @@ $(document).ready(function ($) {
 	$('.times').each(function(e){
 		awe_countDown($(this));
 	});
-
+	let total = 0;
 	if(JSON.parse(localStorage.getItem("cart").length > 0)){
-		console.log("a")
+		
 		JSON.parse(localStorage.getItem("cart")).map((item)=>{
-			console.log(item)
-			$(".list-product").append(`<li class="product-item">
+			total += parseFloat(item.price.slice(0,-1))
+		 $(".list-product").append(`<li class="product-item">
 		<img src=${item.image.substring(1)}>
 		<div class="product-name">${item.product}
 		</div>
@@ -50,10 +50,29 @@ $(document).ready(function ($) {
 		})
 	}
 
-	$(".product-quantity").c
+	$(".total-price").html(`${total}d`)
+	$(".product-quantity").change(function(e){
+		let number = 0;
+		total = 0
+		if($(this).val() < 1 || isNaN($(this).val())) $(this).val("1")
+		$(".product-quantity").each(function(){
+			number += parseInt($(this).val());
+			total += parseFloat($(this).siblings(".product-price").text().slice(0,-1)) * parseInt($(this).val())
+		})
+		localStorage.setItem("cart_number", number)
+		$("#cart-quantity").html(`${localStorage.getItem("cart_number")}`)
+		$(".total-price").html(`${total}d`)
+	})
+	$(".remove-btn").click(function(){
+		let local = JSON.parse(localStorage.getItem("cart"))
+		let value = $(this).siblings(".product-name").text().trim();
+		let removeItem = local.filter(item=>item.product.trim() === value)
+		console.log(removeItem)
+	})
 	$("#cart-quantity").html(localStorage.getItem("cart_number").toString() || 0)
 	dm_click();
 });
+
 
 $(document).ready(function ($) {
 	setTimeout(function(){
